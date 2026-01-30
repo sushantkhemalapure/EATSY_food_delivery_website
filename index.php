@@ -131,6 +131,68 @@
   </br>
 <!-- end of script of scrollCarousel -->
 
+<!-- footer -->
+<footer style="background-color:#c9d2d6; padding: 40px 20px; font-family: Arial, sans-serif;">
+  <div style="max-width: 1200px; margin: auto;">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h2 style="font-weight: bold;">For better experience,<span style="color: #000;"> download the EATSY app now</span></h2>
+      <a href="https://play.google.com/store/search?q=eatsy&c=apps"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" style="height: 50px; margin: 10px;"></a>
+      <a href="https://apps.apple.com/us/app/eatsy/id1234567890"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" style="height: 50px; margin: 10px;"></a>
+    </div>
 
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; text-align: left;">
+      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
+        <img src="img/logo.png" alt="Logo" style="height: 40px;">
+        <p style="margin-top: 10px; font-size: 14px;">© 2025 EATSY Limited</p>
+      </div>
+
+      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
+        <h4>Company</h4>
+        <ul style="list-style: none; padding: 0; font-size: 14px;">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">EATSY Corporate</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">EATSY One</a></li>
+          <li><a href="#">EATSY chefs</a></li>
+          <li><a href="restaurant_login.html">Restaurant Login</a></li>
+        </ul>
+      </div>
+
+      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
+        <h4>Contact us</h4>
+        <ul style="list-style: none; padding: 0; font-size: 14px;">
+          <li><a href="#">Help & Support</a></li>
+          <li><a href="#">Partner with us</a></li>
+          <li><a href="#">Ride with us</a></li>
+        </ul>
+      </div>
+
+      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
+        <h4>Available in:</h4>
+        <ul style="list-style: none; padding: 0; font-size: 14px;">
+          <li>Bangalore</li>
+          <li>Gurgaon</li>
+          <li>Hyderabad</li>
+          <li>Delhi</li>
+          <li>Mumbai</li>
+          <li>Pune</li>
+     
+        </ul>
+      </div>
+
+      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
+        <h4>Life at EATSY</h4>
+        <ul style="list-style: none; padding: 0; font-size: 14px;">
+          <li><a href="#">Explore with EATSY</a></li>
+          <li><a href="#">EATSY News</a></li>
+          <li><a href="#">Snackables</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- end of footer -->
 </body>
 </html>
