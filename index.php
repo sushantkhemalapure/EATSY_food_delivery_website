@@ -92,7 +92,24 @@
 <!--carousel end -->
 
 
-
+<!-- start of scrollCarousel button -->
+<h2>Inspiration for your first order</h2>
+<div class="carousel-container">
+  <button class="arrow left-arrow" onclick="scrollCarousel(-1)">&#8249;</button>
+  <div class="carousel" id="carousel">
+    <?php
+    for ($i = 1; $i <= 15; $i++) {
+      echo '
+        <div class="item">
+          <img src="img/2.png" alt="Food">
+          <p>food</p>
+        </div>';
+    }
+    ?>
+  </div>
+  <button class="arrow right-arrow" onclick="scrollCarousel(1)">&#8250;</button>
+</div>
+<!-- end of scrollCarousel -->
 
 
 <!-- start of cards -->
