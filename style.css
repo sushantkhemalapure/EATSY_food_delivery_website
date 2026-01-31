@@ -9,7 +9,20 @@ h2 {
   margin-bottom: 20px;
 }
 
+.carousel-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin: auto;
+}
 
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 30px;
+  padding: 20px 50px;
+}
 
 .carousel::-webkit-scrollbar {
   display: none;
