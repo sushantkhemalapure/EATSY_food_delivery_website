@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - EATSY</title>
+  <link rel="icon" type="image/x-icon" href="img/logo.png">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px; /* space from viewport edges */
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      display: flex;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto; /* center horizontally */
+    }
+
+    .left {
+      flex: 1;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between; /* Even vertical spacing */
+      min-height: 600px;              /* Ensures enough height for spacing */
+      background-color: #fff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .left h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .left p {
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 16px;
+    }
+
+    .login-btn {
+      background-color: #000;
+      color: #fff;
+      padding: 15px;
+      width: 100%;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ccc;
+    }
+
+    .divider:not(:empty)::before {
+      margin-right: .75em;
+    }
+
+    .divider:not(:empty)::after {
+      margin-left: .75em;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    .social-btn img {
+      height: 20px;
+      margin-right: 10px;
+    }
+
+    .forgot {
+      font-size: 14px;
+      text-align: right;
+      margin-bottom: 20px;
+      color: #000;
+      cursor: pointer;
+    }
+
+    .register {
+      font-size: 14px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .register a {
+      color: #000;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .right {
+      flex: 1;
+      background: url('img/logintem.png') center center/cover no-repeat;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .right {
+        height: 300px;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <h1>Welcome Back!</h1>
+      <p>Sign in with your Username and Password.</p>
+      <input type="text" placeholder="Username" class="input-field">
+      <input type="password" placeholder="Password" class="input-field">
+      <div class="forgot">Forget Password?</div>
+      <button class="login-btn">Login</button>
+      <div class="divider">or login with</div>
+      <button class="social-btn"><img src="https://img.icons8.com/color/48/000000/google-logo.png" alt=""> Login with Google</button>
+      <button class="social-btn"><img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt=""> Login with Facebook</button>
+      <div class="register">Did not have any account? <a href="sign_up.html">Register Now</a></div>
+    </div>
+    <div class="right"></div>
+  </div>
+</body>
+</html>
+
