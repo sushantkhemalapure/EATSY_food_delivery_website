@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up - EATSY</title>
+  <link rel="icon" type="image/x-icon" href="img/logo.png">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      display: flex;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .left {
+      flex: 1;
+      background: url('img/signup.png') center center/cover no-repeat;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .right {
+      flex: 1;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #fff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .right h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .right p {
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 16px;
+    }
+
+    .signup-btn {
+      background-color: #000;
+      color: #fff;
+      padding: 15px;
+      width: 100%;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ccc;
+    }
+
+    .divider:not(:empty)::before {
+      margin-right: .75em;
+    }
+
+    .divider:not(:empty)::after {
+      margin-left: .75em;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    .social-btn img {
+      height: 20px;
+      margin-right: 10px;
+    }
+
+    .login {
+      font-size: 14px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .login a {
+      color: #000;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column-reverse;
+      }
+
+      .left {
+        height: 300px;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form action="signup.php" method="post" class="left">
+      <img src="img/logo.png" alt="EATSY Logo" style="width: 100px; margin-top: 20px;">
+      <h1>EATSY</h1>
+      <p>Join us to explore a world of culinary delights.</p>
+    </div>
+    <div class="right">
+      <h1>Create an Account</h1>
+      <p>Sign up to get started with EATSY.</p>
+      <input type="text" placeholder="Full Name" class="input-field">
+      <input type="email" placeholder="Email" class="input-field">
+      <input type="text" placeholder="Username" class="input-field">
+      <input type="password" placeholder="Password" class="input-field">
+      <input type="password" placeholder="Re-enter Password" class="input-field">
+      <button class="signup-btn">Sign Up</button>
+      <div class="divider">or sign up with</div>
+      <button class="social-btn"><img src="https://img.icons8.com/color/48/000000/google-logo.png" alt=""> Sign up with Google</button>
+      <button class="social-btn"><img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt=""> Sign up with Facebook</button>
+      <div class="login">Already have an account? <a href="login.html">Login Here</a></div>
+    </div>
+    </form>
+  </div>
+  
+</body>
+</html>
