@@ -452,7 +452,30 @@ function launchConfetti() {
     });
   }
 
-  
+  let animId;
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive = false;
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.15;
+      p.rot += p.rotV;
+      p.life -= 0.008;
+      if (p.life <= 0) return;
+      alive = true;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI/180);
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+      ctx.restore();
+    });
+    if (alive) animId = requestAnimationFrame(animate);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  animate();
 }
 
 // ─── CLOSE MODAL ON BACKDROP ─────────────────────────────────
