@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spin & Feast 🍕</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0f0e17;
+    --card-bg: #1a1a2e;
+    --accent1: #ff6b6b;
+    --accent2: #ffd93d;
+    --accent3: #6bcb77;
+    --accent4: #4d96ff;
+    --accent5: #ff922b;
+    --accent6: #cc5de8;
+    --accent7: #f06595;
+    --accent8: #51cf66;
+    --text: #eee;
+    --pointer: #fff;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Ambient floating blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width:400px; height:400px; background:#ff6b6b; top:-100px; left:-100px; }
+  .blob-2 { width:300px; height:300px; background:#4d96ff; bottom:-80px; right:-80px; }
+  .blob-3 { width:250px; height:250px; background:#ffd93d; top:50%; left:60%; }
+
+  /* Header */
+  .header {
+    position: relative; z-index:1;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-family: 'Bangers', cursive;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 18px rgba(255,107,107,0.4));
+  }
+  .header p {
+    color: #888;
+    font-size: 0.95rem;
+    margin-top:4px;
+    font-weight:700;
+  }
+
+  /* Wheel Container */
+  .wheel-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Pointer / Arrow */
+  .pointer {
+    width: 0; height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-top: 44px solid var(--accent2);
+    position: relative;
+    z-index: 5;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    margin-bottom: -12px;
+  }
+
+  /* SVG Wheel */
+  .wheel-svg-wrap {
+    position: relative;
+    width: 340px;
+    height: 340px;
+  }
+  .wheel-svg-wrap svg {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5), 0 0 80px rgba(255,107,107,0.12);
+  }
+  #wheel {
+    transform-origin: center center;
+    transition: none;
+  }
+  #wheel.spinning {
+    transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  }
+
+  /* Center circle */
+  .center-circle {
+    position: absolute;
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    width:56px; height:56px;
+    border-radius:50%;
+    background: linear-gradient(135deg,#2a2a4a,#1a1a2e);
+    border: 4px solid var(--accent2);
+    display: flex; align-items:center; justify-content:center;
+    font-size:1.6rem;
+    z-index:3;
+    box-shadow: 0 0 16px rgba(255,217,61,0.4);
+  }
+
+  /* Spin Button */
+  .spin-btn {
+    margin-top: 24px;
+    padding: 14px 52px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent1), var(--accent5));
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(255,107,107,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative; z-index:1;
+  }
+  .spin-btn:hover { transform:scale(1.06); box-shadow: 0 8px 32px rgba(255,107,107,0.55); }
+  .spin-btn:active { transform:scale(0.97); }
+  .spin-btn:disabled { opacity:0.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  /* Result Modal */
+  .modal-overlay {
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.7);
+    z-index:100;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show { opacity:1; pointer-events:auto; }
+  .modal {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 36px 40px;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    position:relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
+    transform: scale(0.85);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal-overlay.show .modal { transform:scale(1); }
+  .modal .emoji { font-size: 3.2rem; margin-bottom:8px; }
+  .modal h2 {
+    font-family:'Bangers',cursive;
+    font-size:1.8rem;
+    letter-spacing:1px;
+    color: var(--accent2);
+    margin-bottom:6px;
+  }
+  .modal .offer-text {
+    font-size:1.15rem;
+    font-weight:900;
+    color:#fff;
+    margin-bottom:6px;
+  }
+  .modal .offer-desc {
+    color:#999;
+    font-size:0.88rem;
+    margin-bottom:20px;
+    line-height:1.4;
+  }
+  .modal .code-box {
+    background: rgba(255,255,255,0.06);
+    border: 2px dashed var(--accent2);
+    border-radius:14px;
+    padding:10px 20px;
+    display:inline-block;
+    margin-bottom:20px;
+  }
+  .modal .code-label { color:#666; font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; }
+  .modal .code-val {
+    font-family:'Bangers',cursive;
+    font-size:1.45rem;
+    color:var(--accent2);
+    letter-spacing:3px;
+  }
+  .modal .close-btn {
+    background:linear-gradient(135deg,var(--accent1),var(--accent5));
+    color:#fff; border:none; border-radius:50px;
+    padding:10px 36px;
+    font-family:'Nunito',sans-serif;
+    font-weight:900;
+    font-size:0.95rem;
+    cursor:pointer;
+    transition:transform 0.15s;
+  }
+  .modal .close-btn:hover { transform:scale(1.05); }
+
+  /* Confetti canvas */
+  #confetti-canvas {
+    position:fixed; inset:0; pointer-events:none; z-index:99;
+  }
+
+  /* Tick sound visual cue */
+  .tick-flash {
+    position: absolute;
+    inset:0;
+    border-radius:50%;
+    background: rgba(255,255,255,0.08);
+    pointer-events:none;
+    z-index:2;
+    opacity:0;
+    transition: opacity 0.05s;
+  }
+  .tick-flash.active { opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- Ambient blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- Header -->
+<div class="header">
+  <h1>🍕 SPIN & FEAST</h1>
+  <p>Spin the wheel to unlock your food delivery offer!</p>
+</div>
+
+<!-- Wheel -->
+<div class="wheel-container">
+  <div class="pointer"></div>
+  <div class="wheel-svg-wrap">
+    <svg viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="wheelClip">
+          <circle cx="170" cy="170" r="165"/>
+        </clipPath>
+      </defs>
+      <g id="wheel" clip-path="url(#wheelClip)">
+        <!-- segments drawn via JS -->
+      </g>
+      <!-- Outer ring border -->
+      <circle cx="170" cy="170" r="165" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+    </svg>
+    <div class="center-circle">🎰</div>
+    <div class="tick-flash" id="tickFlash"></div>
+  </div>
+  <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN!</button>
+</div>
+
+<!-- Result Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="emoji" id="modalEmoji"></div>
+    <h2 id="modalTitle"></h2>
+    <div class="offer-text" id="modalOffer"></div>
+    <div class="offer-desc" id="modalDesc"></div>
+    <div class="code-box">
+      <div class="code-label">Your Promo Code</div>
+      <div class="code-val" id="modalCode"></div>
+    </div><br/>
+    <button class="close-btn" onclick="closeModal()">Claim Offer 🎉</button>
+  </div>
+</div>
+
+<!-- Confetti -->
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+// ─── OFFERS DATA ─────────────────────────────────────────────
+const offers = [
+  { label:"Free Delivery",   emoji:"🚚", color:"#ff6b6b", desc:"Free delivery on your next order. No minimum spend required!", code:"FREESHIP25" },
+  { label:"30% OFF",         emoji:"🔥", color:"#ffd93d", desc:"Get 30% off your entire order. Valid on all restaurants.", code:"BLAZE30" },
+  { label:"Buy 1 Get 1",     emoji:"🍔", color:"#6bcb77", desc:"Order two meals, pay for one! Pick any two items.", code:"BOGO2024" },
+  { label:"₹200 Off",        emoji:"💰", color:"#4d96ff", desc:"Flat ₹200 off on orders above ₹600. One-time use.", code:"CASH200" },
+  { label:"50% OFF Dessert", emoji:"🍰", color:"#ff922b", desc:"Half price on any dessert item. Sweet treat awaits!", code:"SWEET50" },
+  { label:"Free Drink",      emoji:"🥤", color:"#cc5de8", desc:"Add any drink to your order completely free of charge.", code:"SIPP1NG" },
+  { label:"₹100 Off",        emoji:"🎁", color:"#f06595", desc:"₹100 off on orders above ₹400. Easy savings!", code:"GIFT100" },
+  { label:"20% OFF",         emoji:"⭐", color:"#51cf66", desc:"Enjoy 20% off your order from any top-rated restaurant.", code:"STAR20" },
+];
+
+const SEGMENTS = offers.length;
+const CX = 170, CY = 170, R = 165;
+const anglePerSeg = (2 * Math.PI) / SEGMENTS;
+
+// ─── DRAW WHEEL ──────────────────────────────────────────────
+function drawWheel() {
+  const g = document.getElementById('wheel');
+  g.innerHTML = '';
+
+  offers.forEach((offer, i) => {
+    const startAngle = i * anglePerSeg - Math.PI / 2;
+    const endAngle   = startAngle + anglePerSeg;
+
+    const x1 = CX + R * Math.cos(startAngle);
+    const y1 = CY + R * Math.sin(startAngle);
+    const x2 = CX + R * Math.cos(endAngle);
+    const y2 = CY + R * Math.sin(endAngle);
+
+    // Segment path
+    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+    path.setAttribute("d", `M${CX},${CY} L${x1},${y1} A${R},${R} 0 0,1 ${x2},${y2} Z`);
+    path.setAttribute("fill", offer.color);
+    path.setAttribute("stroke", "rgba(0,0,0,0.25)");
+    path.setAttribute("stroke-width", "2");
+    g.appendChild(path);
+
+    // Label
+    const midAngle = startAngle + anglePerSeg / 2;
+    const labelR   = R * 0.62;
+    const tx = CX + labelR * Math.cos(midAngle);
+    const ty = CY + labelR * Math.sin(midAngle);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+    text.setAttribute("x", tx);
+    text.setAttribute("y", ty);
+    text.setAttribute("text-anchor","middle");
+    text.setAttribute("dominant-baseline","middle");
+    text.setAttribute("transform", `rotate(${(midAngle * 180/Math.PI)+90}, ${tx}, ${ty})`);
+    text.setAttribute("font-family","Bangers, cursive");
+    text.setAttribute("font-size","13.5");
+    text.setAttribute("fill","#fff");
+    text.setAttribute("style","text-shadow:0 1px 3px rgba(0,0,0,0.5); pointer-events:none;");
+    text.textContent = offer.label;
+    g.appendChild(text);
+
+    // Emoji
+    const emojiR = R * 0.88;
+    const ex = CX + emojiR * Math.cos(midAngle);
+    const ey = CY + emojiR * Math.sin(midAngle);
+
+    const emojiText = document.createElementNS("http://www.w3.org/2000/svg","text");
+    emojiText.setAttribute("x", ex);
+    emojiText.setAttribute("y", ey);
+    emojiText.setAttribute("text-anchor","middle");
+    emojiText.setAttribute("dominant-baseline","middle");
+    emojiText.setAttribute("transform", `rotate(${(midAngle * 180/Math.PI)+90}, ${ex}, ${ey})`);
+    emojiText.setAttribute("font-size","20");
+    emojiText.textContent = offer.emoji;
+    g.appendChild(emojiText);
+  });
+}
+drawWheel();
+
+// ─── SPIN LOGIC ──────────────────────────────────────────────
+let spinning = false;
+let currentRotation = 0;
+
+function spinWheel() {
+  if (spinning) return;
+  spinning = true;
+  document.getElementById('spinBtn').disabled = true;
+
+  // Pick a random winning segment
+  const winIndex   = Math.floor(Math.random() * SEGMENTS);
+  // Target angle so that segment lands at top (pointer is at top = -90°)
+  // Each segment center = (winIndex + 0.5) * anglePerSeg
+  // We want that center at the top → rotation = -(winIndex+0.5)*anglePerSeg - currentRotation (mod)
+  const fullSpins  = (3 + Math.floor(Math.random() * 3)) * 360; // 3-5 full rotations
+  const targetDeg  = -((winIndex + 0.5) * (360 / SEGMENTS));
+  const totalDeg   = fullSpins + (targetDeg - (currentRotation % 360) + 360) % 360;
+
+  currentRotation += totalDeg;
+
+  const wheel = document.getElementById('wheel');
+  wheel.classList.add('spinning');
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+  // Tick sound simulation – flash on each segment pass
+  const segTime = 4000 / SEGMENTS;
+  let ticks = 0;
+  const tickMax = SEGMENTS * (3 + Math.floor(Math.random()*3));
+  const tickFlash = document.getElementById('tickFlash');
+  const tickInterval = setInterval(() => {
+    ticks++;
+    tickFlash.classList.add('active');
+    setTimeout(() => tickFlash.classList.remove('active'), 40);
+    if (ticks >= tickMax) clearInterval(tickInterval);
+  }, segTime);
+
+  setTimeout(() => {
+    wheel.classList.remove('spinning');
+    spinning = false;
+    showResult(winIndex);
+  }, 4000);
+}
+
+// ─── MODAL ───────────────────────────────────────────────────
+function showResult(index) {
+  const o = offers[index];
+  document.getElementById('modalEmoji').textContent  = o.emoji;
+  document.getElementById('modalTitle').textContent  = "You Won!";
+  document.getElementById('modalOffer').textContent  = o.label;
+  document.getElementById('modalDesc').textContent   = o.desc;
+  document.getElementById('modalCode').textContent   = o.code;
+  document.getElementById('modalOverlay').classList.add('show');
+  launchConfetti();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.getElementById('spinBtn').disabled = false;
+}
+
+// ─── CONFETTI ────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#f06595','#51cf66','#fff'];
+
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: -20,
+      vx: (Math.random()-0.5) * 14,
+      vy: (Math.random()*5)+2,
+      size: Math.random()*8+4,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*360,
+      rotV: (Math.random()-0.5)*12,
+      life: 1
+    });
+  }
+
+  
+}
+
+// ─── CLOSE MODAL ON BACKDROP ─────────────────────────────────
+document.getElementById('modalOverlay').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
