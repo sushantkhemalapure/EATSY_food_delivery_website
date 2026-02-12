@@ -1,215 +1,250 @@
+<?php
+require_once 'includes/config.php';
+
+// Initialize database if not exists
+if (!file_exists(__DIR__ . '/database/eatsy.db')) {
+    require_once 'includes/init_db.php';
+}
+
+$db = Database::getInstance()->getConnection();
+
+// Fetch featured restaurants
+$stmt = $db->query("SELECT * FROM restaurants WHERE is_active = 1 LIMIT 6");
+$restaurants = $stmt->fetchAll();
+
+// Fetch popular menu items
+$stmt = $db->query("SELECT m.*, r.name as restaurant_name, r.delivery_time 
+                    FROM menu_items m 
+                    JOIN restaurants r ON m.restaurant_id = r.id 
+                    WHERE m.is_available = 1 
+                    LIMIT 12");
+$menuItems = $stmt->fetchAll();
+
+// Fetch featured chefs
+$stmt = $db->query("SELECT * FROM chefs WHERE is_available = 1 LIMIT 6");
+$chefs = $stmt->fetchAll();
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>EATSY</title>
-    <link rel="icon" type="image/x-icon" href="img/logo.png">
-  <link rel="stylesheet" href="styles.css">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EATSY - Order Food & Hire Chefs</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<!-- begining of navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">
-        <a class="navbar-brand" href="#">
-          <img  src="img/logo.png"  alt="" width="100" height="60"  class="left">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Help</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                More
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#">Popular</a></li>
-                <li><a class="dropdown-item" href="login.html">Login</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="spin_wheel.html">Spin a wheel</a></li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Offers</a>
-            </li>
-          </ul>
-          <form class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="index.php">
+                    <img src="images/logo.png" alt="EATSY Logo">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.php">Home</a></li>
+                <li><a href="restaurants.php">Restaurants</a></li>
+                <li><a href="chefs.php">Hire a Chef</a></li>
+                <li><a href="about.php">About</a></li>
+                <?php if (isLoggedIn()): ?>
+                    <li><a href="my-orders.php">My Orders</a></li>
+                    <li><a href="profile.php">Profile</a></li>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php else: ?>
+                    <li><a href="login.php" class="btn btn-outline">Login</a></li>
+                    <li><a href="register.php" class="btn btn-primary">Sign Up</a></li>
+                <?php endif; ?>
+                <li>
+                    <a href="cart.php" class="cart-icon">
+                        🛒
+                        <span class="cart-count">0</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-      </div>
     </nav>
-<!-- end of navigation bar -->
 
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Delicious Food, Delivered Fast</h1>
+        <p>Order from the best restaurants or hire a professional chef</p>
+        <div class="search-box">
+            <input type="search" placeholder="Search for restaurants, dishes, or cuisines...">
+            <button>Search</button>
+        </div>
+    </section>
 
-<!-- carousel start  -->
-<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="false">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="img/1.png" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-      </div>
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Categories Section -->
+        <section class="section">
+            <h2 class="section-title">Explore Cuisines</h2>
+            <div class="category-carousel" id="categoryCarousel">
+                <div class="category-item">
+                    <img src="images/1.png" alt="Italian">
+                    <p>Italian</p>
+                </div>
+                <div class="category-item">
+                    <img src="images/2.png" alt="Indian">
+                    <p>Indian</p>
+                </div>
+                <div class="category-item">
+                    <img src="images/3.png" alt="Japanese">
+                    <p>Japanese</p>
+                </div>
+                <div class="category-item">
+                    <img src="images/1.png" alt="Chinese">
+                    <p>Chinese</p>
+                </div>
+                <div class="category-item">
+                    <img src="images/2.png" alt="Mexican">
+                    <p>Mexican</p>
+                </div>
+                <div class="category-item">
+                    <img src="images/3.png" alt="Thai">
+                    <p>Thai</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Restaurants -->
+        <section class="section">
+            <h2 class="section-title">Featured Restaurants</h2>
+            <div class="grid">
+                <?php foreach ($restaurants as $restaurant): ?>
+                <div class="card" onclick="window.location.href='restaurant.php?id=<?= $restaurant['id'] ?>'">
+                    <img src="images/<?= htmlspecialchars($restaurant['image']) ?>" alt="<?= htmlspecialchars($restaurant['name']) ?>" class="card-image">
+                    <div class="card-content">
+                        <h3 class="card-title"><?= htmlspecialchars($restaurant['name']) ?></h3>
+                        <p class="card-description"><?= htmlspecialchars($restaurant['description']) ?></p>
+                        <div style="margin: 0.5rem 0;">
+                            <span class="badge badge-new"><?= htmlspecialchars($restaurant['cuisine_type']) ?></span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span>⭐ <?= number_format($restaurant['rating'], 1) ?></span>
+                            </div>
+                            <div>
+                                <small>🕒 <?= htmlspecialchars($restaurant['delivery_time']) ?></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="restaurants.php" class="btn btn-primary">View All Restaurants</a>
+            </div>
+        </section>
+
+        <!-- Popular Dishes -->
+        <section class="section">
+            <h2 class="section-title">Popular Dishes</h2>
+            <div class="grid">
+                <?php foreach ($menuItems as $item): ?>
+                <div class="card" data-category="<?= htmlspecialchars($item['category']) ?>">
+                    <img src="images/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" class="card-image">
+                    <div class="card-content">
+                        <h3 class="card-title"><?= htmlspecialchars($item['name']) ?></h3>
+                        <p class="card-description"><?= htmlspecialchars($item['description']) ?></p>
+                        <div style="margin: 0.5rem 0;">
+                            <span class="badge <?= $item['is_vegetarian'] ? 'badge-veg' : 'badge-nonveg' ?>">
+                                <?= $item['is_vegetarian'] ? '🌱 Veg' : '🍖 Non-Veg' ?>
+                            </span>
+                        </div>
+                        <p style="color: #666; font-size: 0.9rem;">from <?= htmlspecialchars($item['restaurant_name']) ?></p>
+                        <div class="card-footer">
+                            <div class="price">₹<?= number_format($item['price'], 2) ?></div>
+                            <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); addToCart(<?= $item['id'] ?>, '<?= htmlspecialchars($item['name']) ?>', <?= $item['price'] ?>, <?= $item['restaurant_id'] ?>)">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <!-- Hire a Chef Section -->
+        <section class="section" style="background: linear-gradient(135deg, #FFE66D, #FF6B6B); padding: 3rem; border-radius: 20px; text-align: center;">
+            <h2 style="color: white; font-size: 2.5rem; margin-bottom: 1rem;">Need a Chef for Your Event?</h2>
+            <p style="color: white; font-size: 1.2rem; margin-bottom: 2rem;">Hire professional chefs for parties, events, or personal cooking</p>
+            <a href="chefs.php" class="btn" style="background: white; color: #FF6B6B; padding: 1rem 3rem; font-size: 1.1rem;">Browse Chefs</a>
+        </section>
+
+        <!-- Featured Chefs -->
+        <section class="section">
+            <h2 class="section-title">Featured Chefs</h2>
+            <div class="grid">
+                <?php foreach ($chefs as $chef): ?>
+                <div class="card chef-card" onclick="window.location.href='chef.php?id=<?= $chef['id'] ?>'">
+                    <div class="card-content">
+                        <img src="images/<?= htmlspecialchars($chef['image']) ?>" alt="<?= htmlspecialchars($chef['name']) ?>">
+                        <h3 class="card-title"><?= htmlspecialchars($chef['name']) ?></h3>
+                        <p class="chef-specialty"><?= htmlspecialchars($chef['specialty']) ?></p>
+                        <p class="card-description"><?= htmlspecialchars($chef['bio']) ?></p>
+                        <div class="card-footer">
+                            <div class="rating">
+                                <span>⭐ <?= number_format($chef['rating'], 1) ?></span>
+                            </div>
+                            <div class="chef-rate">₹<?= number_format($chef['hourly_rate']) ?>/hr</div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <span class="badge badge-new"><?= $chef['experience_years'] ?> yrs exp</span>
+                            <span class="badge badge-veg">📍 <?= htmlspecialchars($chef['city']) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="chefs.php" class="btn btn-secondary">View All Chefs</a>
+            </div>
+        </section>
     </div>
-    <div class="carousel-item">
-      <img src="img/2.png" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
 
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="img/3.png" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <img src="images/logo.png" alt="EATSY" style="height: 50px; margin-bottom: 1rem;">
+                <p>Delicious food delivered to your doorstep</p>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.php">About Us</a></li>
+                    <li><a href="careers.php">Careers</a></li>
+                    <li><a href="restaurant-partner.php">Partner with Us</a></li>
+                    <li><a href="chef-partner.php">Become a Chef</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>For Customers</h4>
+                <ul>
+                    <li><a href="help.php">Help & Support</a></li>
+                    <li><a href="faq.php">FAQ</a></li>
+                    <li><a href="terms.php">Terms of Service</a></li>
+                    <li><a href="privacy.php">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Available In</h4>
+                <ul>
+                    <li>Bangalore</li>
+                    <li>Mumbai</li>
+                    <li>Delhi</li>
+                    <li>Hyderabad</li>
+                    <li>Pune</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 EATSY. All rights reserved.</p>
+        </div>
+    </footer>
 
-      </div>
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-<!--carousel end -->
-
-
-<!-- start of scrollCarousel button -->
-<h2>Inspiration for your first order</h2>
-<div class="carousel-container">
-  <button class="arrow left-arrow" onclick="scrollCarousel(-1)">&#8249;</button>
-  <div class="carousel" id="carousel">
-    <?php
-    for ($i = 1; $i <= 15; $i++) {
-      echo '
-        <div class="item">
-          <img src="img/2.png" alt="Food">
-          <p>food</p>
-        </div>';
-    }
-    ?>
-  </div>
-  <button class="arrow right-arrow" onclick="scrollCarousel(1)">&#8250;</button>
-</div>
-<!-- end of scrollCarousel -->
-
-
-<!-- start of cards -->
-<div class="card-grid">
-  <?php
-  $card = '
-    <div class="card">
-      <img src="img/3.png" alt="Food Image">
-      <div class="card-body">
-        <h3>Dish Name</h3>
-        <h4>Delivery Time</h4>
-        <h4>Price</h4>
-        <h5>Rating</h5>
-        <p>Location</p>
-      </div>
-    </div>';
-  for ($i = 1; $i <= 9; $i++) {
-    echo $card;
-  }
-  ?>
-  <!-- stend  of cards -->
-</div>
-<!-- script of scrollCarousel -->
-<script>
-  function scrollCarousel(direction) {
-    const container = document.getElementById('carousel');
-    const scrollAmount = 160;
-    container.scrollBy({
-      left: direction * scrollAmount,
-      behavior: 'smooth'
-    });
-  }
-  
-</script>
-  <br>
-  </br>
-<!-- end of script of scrollCarousel -->
-
-<!-- footer -->
-<footer style="background-color:#c9d2d6; padding: 40px 20px; font-family: Arial, sans-serif;">
-  <div style="max-width: 1200px; margin: auto;">
-    <div style="text-align: center; margin-bottom: 20px;">
-      <h2 style="font-weight: bold;">For better experience,<span style="color: #000;"> download the EATSY app now</span></h2>
-      <a href="https://play.google.com/store/search?q=eatsy&c=apps"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" style="height: 50px; margin: 10px;"></a>
-      <a href="https://apps.apple.com/us/app/eatsy/id1234567890"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" style="height: 50px; margin: 10px;"></a>
-    </div>
-
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; text-align: left;">
-      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
-        <img src="img/logo.png" alt="Logo" style="height: 40px;">
-        <p style="margin-top: 10px; font-size: 14px;">© 2025 EATSY Limited</p>
-      </div>
-
-      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
-        <h4>Company</h4>
-        <ul style="list-style: none; padding: 0; font-size: 14px;">
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">EATSY Corporate</a></li>
-          <li><a href="#">Careers</a></li>
-          <li><a href="#">Team</a></li>
-          <li><a href="#">EATSY One</a></li>
-          <li><a href="#">EATSY chefs</a></li>
-          <li><a href="restaurant_login.html">Restaurant Login</a></li>
-        </ul>
-      </div>
-
-      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
-        <h4>Contact us</h4>
-        <ul style="list-style: none; padding: 0; font-size: 14px;">
-          <li><a href="#">Help & Support</a></li>
-          <li><a href="#">Partner with us</a></li>
-          <li><a href="#">Ride with us</a></li>
-        </ul>
-      </div>
-
-      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
-        <h4>Available in:</h4>
-        <ul style="list-style: none; padding: 0; font-size: 14px;">
-          <li>Bangalore</li>
-          <li>Gurgaon</li>
-          <li>Hyderabad</li>
-          <li>Delhi</li>
-          <li>Mumbai</li>
-          <li>Pune</li>
-     
-        </ul>
-      </div>
-
-      <div style="flex: 1; min-width: 180px; margin-bottom: 20px;">
-        <h4>Life at EATSY</h4>
-        <ul style="list-style: none; padding: 0; font-size: 14px;">
-          <li><a href="#">Explore with EATSY</a></li>
-          <li><a href="#">EATSY News</a></li>
-          <li><a href="#">Snackables</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</footer>
-
-  <!-- end of footer -->
+    <script src="js/main.js"></script>
 </body>
 </html>
