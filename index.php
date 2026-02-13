@@ -1,28 +1,47 @@
 <?php
-require_once 'includes/config.php';
+$restaurants = [];
+$menuItems = [];
+$chefs = [];
 
-// Initialize database if not exists
-if (!file_exists(__DIR__ . '/database/eatsy.db')) {
-    require_once 'includes/init_db.php';
+if (!function_exists('isLoggedIn')) {
+    function isLoggedIn() {
+        return false;
+    }
 }
 
-$db = Database::getInstance()->getConnection();
+$configFile = __DIR__ . '/includes/config.php';
+if (file_exists($configFile)) {
+    require_once $configFile;
 
-// Fetch featured restaurants
-$stmt = $db->query("SELECT * FROM restaurants WHERE is_active = 1 LIMIT 6");
-$restaurants = $stmt->fetchAll();
+    $dbFile = __DIR__ . '/database/eatsy.db';
+    $initDbFile = __DIR__ . '/includes/init_db.php';
+    if (!file_exists($dbFile) && file_exists($initDbFile)) {
+        require_once $initDbFile;
+    }
 
-// Fetch popular menu items
-$stmt = $db->query("SELECT m.*, r.name as restaurant_name, r.delivery_time 
-                    FROM menu_items m 
-                    JOIN restaurants r ON m.restaurant_id = r.id 
-                    WHERE m.is_available = 1 
-                    LIMIT 12");
-$menuItems = $stmt->fetchAll();
+    if (class_exists('Database')) {
+        try {
+            $db = Database::getInstance()->getConnection();
 
-// Fetch featured chefs
-$stmt = $db->query("SELECT * FROM chefs WHERE is_available = 1 LIMIT 6");
-$chefs = $stmt->fetchAll();
+            $stmt = $db->query("SELECT * FROM restaurants WHERE is_active = 1 LIMIT 6");
+            $restaurants = $stmt ? $stmt->fetchAll() : [];
+
+            $stmt = $db->query("SELECT m.*, r.name as restaurant_name, r.delivery_time
+                                FROM menu_items m
+                                JOIN restaurants r ON m.restaurant_id = r.id
+                                WHERE m.is_available = 1
+                                LIMIT 12");
+            $menuItems = $stmt ? $stmt->fetchAll() : [];
+
+            $stmt = $db->query("SELECT * FROM chefs WHERE is_available = 1 LIMIT 6");
+            $chefs = $stmt ? $stmt->fetchAll() : [];
+        } catch (Throwable $e) {
+            $restaurants = [];
+            $menuItems = [];
+            
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +50,7 @@ $chefs = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EATSY - Order Food & Hire Chefs</title>
     <link rel="icon" type="image/png" href="images/logo.png">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Navigation -->
