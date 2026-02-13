@@ -38,7 +38,7 @@ if (file_exists($configFile)) {
         } catch (Throwable $e) {
             $restaurants = [];
             $menuItems = [];
-            
+            $chefs = [];
         }
     }
 }
